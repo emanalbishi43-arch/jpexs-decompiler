@@ -3333,8 +3333,9 @@ public class Graph {
                 }
             }
 
-            if (code.size() <= part.start) {                
+            if (code.size() <= part.start) {
                 if (!(!ret.isEmpty() && ret.get(ret.size() - 1) instanceof ExitItem)) {
+                    stack.moveToOutput(ret, true);
                     ret.add(new ScriptEndItem(dialect));
                 }
                 return ret;
@@ -3499,6 +3500,7 @@ public class Graph {
                 } while (exHappened);
                 if ((part.end >= code.size() - 1) && getNextParts(localData, part).isEmpty()) {
                     if (!(!output.isEmpty() && output.get(output.size() - 1) instanceof ExitItem)) {
+                        stack.moveToOutput(output, true);
                         output.add(new ScriptEndItem(dialect));
                     }
                 }
