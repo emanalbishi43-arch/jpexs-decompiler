@@ -3333,8 +3333,9 @@ public class Graph {
                 }
             }
 
-            if (code.size() <= part.start) {
+            if (code.size() <= part.start) {                
                 if (!(!ret.isEmpty() && ret.get(ret.size() - 1) instanceof ExitItem)) {
+                    stack.setConnectedOutput(0, ret);
                     stack.addToOutput(new ScriptEndItem(dialect));                  
                 }
                 return ret;
