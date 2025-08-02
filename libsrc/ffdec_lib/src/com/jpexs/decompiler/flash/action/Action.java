@@ -1380,7 +1380,7 @@ public abstract class Action implements GraphSourceItem {
                 store.setStore(actions.subList(ip + 1, ip + 1 + store.getStoreSize()));
                 ip = ip + 1 + store.getStoreSize() - 1/*ip++ will be next*/;
             }
-
+            
             action.translate(localData, stack, output, staticOperation, path);
 
             if (((action instanceof ActionSetTarget) || (action instanceof ActionSetTarget2)) && (!stack.isEmpty())) {
