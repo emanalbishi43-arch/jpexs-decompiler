@@ -379,8 +379,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "Boolean");
+    public final GraphTextWriter toStringBoolean(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "Boolean", false);
     }
 
     /**
@@ -391,8 +391,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "String");
+    public final GraphTextWriter toStringString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "String", false);
     }
 
     /**
@@ -403,8 +403,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringInt(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "int");
+    public final GraphTextWriter toStringInt(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "int", false);
     }
 
     /**
@@ -415,8 +415,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toStringNumber(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "Number");
+    public final GraphTextWriter toStringNumber(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return toString(writer, localData, "Number", false);
     }
 
     /**
@@ -435,16 +435,17 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @param writer Writer
      * @param localData Local data
      * @param implicitCoerce Implicit coerce
+     * @param noParenthesis Do not use parenthesis
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
+    public GraphTextWriter toString(GraphTextWriter writer, LocalData localData, String implicitCoerce, boolean noParenthesis) throws InterruptedException {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
         }
 
         writer.startOffset(src, getLineStartItem(), getPos(), srcData);
-        appendTry(writer, localData, implicitCoerce);
+        appendTry(writer, localData, implicitCoerce, noParenthesis);
         writer.endOffset();
         return writer;
     }
@@ -458,7 +459,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @throws InterruptedException On interrupt
      */
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return toString(writer, localData, "");
+        return toString(writer, localData, "", false);
     }
 
     /**
@@ -484,6 +485,18 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @throws InterruptedException On interrupt
      */
     public abstract GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException;
+    
+    /**
+     * Append this to a writer, ignoring parenthesis (in CommaExpression and/or Parenthesis)
+     *
+     * @param writer Writer
+     * @param localData Local data
+     * @return Writer
+     * @throws InterruptedException On interrupt
+     */    
+    public GraphTextWriter appendNoParenthesis(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return appendTo(writer, localData);
+    }
 
     /**
      * Append this to a writer.
@@ -494,7 +507,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @throws InterruptedException On interrupt
      */
     public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return appendTry(writer, localData, "");
+        return appendTry(writer, localData, "", false);
     }
 
     /**
@@ -506,7 +519,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
      * @return Writer
      * @throws InterruptedException On interrupt
      */
-    public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
+    public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce, boolean noParenthesis) throws InterruptedException {
         GraphTargetItem t = this;
         if (!implicitCoerce.isEmpty()) {    //if implicit coerce equals explicit
             /*if (t instanceof ConvertAVM2Item) {
@@ -529,6 +542,9 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         }
         if (!implicitCoerce.isEmpty() && Configuration.simplifyExpressions.get()) {
             t = t.simplify(implicitCoerce);
+        }
+        if (noParenthesis) {
+            return t.appendNoParenthesis(writer, localData);
         }
         return t.appendTo(writer, localData);
 
@@ -1119,5 +1135,5 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             }
         }
         return o1.equals(o2);
-    }
+    }      
 }
