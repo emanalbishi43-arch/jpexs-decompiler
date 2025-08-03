@@ -3828,6 +3828,8 @@ public class Graph {
                                     GraphTargetItem rightSide = ((PushItem) filteredOnTrue.get(filteredOnTrue.size() - 1)).value;
                                     GraphTargetItem prevExpr = stack.pop();
                                     GraphTargetItem leftSide = expr.getNotCoercedNoDup();
+                                    
+                                    prevExpr = prevExpr.getThroughDuplicate();
 
                                     boolean hideEmptyTrueFalse = true;
 
